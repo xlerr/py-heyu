@@ -38,12 +38,9 @@ class Handler:
             self.process(file)
 
     def process(self, file_name):
-        width = 824
-        height = 488
-        box = (115, 100, 690, 360)
-        img = Image.open(self.src_dir + file_name)
-        img = img.resize((width, height), Image.ANTIALIAS)
-        img = img.crop(box)
+        width = 690
+        height = 360
+        img = Image.open(self.src_dir + file_name).resize((824, 488), Image.ANTIALIAS).crop((115, 100, width, height))
         img = self.transparent_back(img)
 
         nImg = Image.new("RGBA", (width * 4, height))
@@ -58,7 +55,7 @@ class Handler:
 
         img = Image.new("RGBA", (2479, 3508), (255, 255, 255, 255))
         for i in range(0, 11):
-            pos = (30, 200 + (height + 30) * i)
+            pos = (30, 200 + (height + 24) * i)
             img.paste(nImg, pos, nImg)
 
         font = ImageFont.truetype('./static/simsun.ttc', 82)
