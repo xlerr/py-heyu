@@ -1,3 +1,5 @@
 /.idea
 /venv
 /temp.png
+/temp
+/__pycache__/

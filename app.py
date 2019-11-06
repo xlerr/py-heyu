@@ -66,7 +66,7 @@ for i in range(0, 11):
     pos = (30, 3508 - (height + 30 * int(bool(i))) * (i + 1))
     img.paste(nImg, pos, nImg)
 
-font = ImageFont.truetype('./static/simsun.ttc', 82, index=1)
+font = ImageFont.truetype('./static/simsun.ttc', 82)
 
 text_width, text_height = font.getsize(text)
 
