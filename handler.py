@@ -12,26 +12,20 @@ class Handler:
     text: str
     text_color: str
 
-    autograph_color: tuple
+    signatureColor: list
 
-    def __init__(self, files: list, src_dir: str, save_path: str):
-        self.files = files
-        self.src_dir = src_dir.rstrip('/') + '/'
-        self.save_path = save_path.rstrip('/') + '/'
-
-        if not os.path.exists(self.src_dir):
-            os.mkdir(self.src_dir, 0o755)
+    def __init__(self, config):
+        self.src_dir = config['sourcePath'].rstrip('/') + '/'
+        self.save_path = config['savePath'].rstrip('/') + '/'
+        self.files = self.findImageFile()
 
         if not os.path.exists(self.save_path):
             os.mkdir(self.save_path, 0o755)
 
-        cfg = ConfigParser()
-        cfg.read('config.ini')
+        self.text = config['title']
+        self.text_color = config['titleColor']
 
-        self.text = cfg.get('title', 'text')
-        self.text_color = cfg.get('title', 'color')
-
-        self.autograph_color = self.hex2rgb(cfg.get('autograph', 'color'))
+        self.signatureColor = config['signatureColor']
 
     def run(self):
         for file in self.files:
@@ -67,6 +61,14 @@ class Handler:
 
         img.save(self.save_path + file_name + '.png')
 
+    def findImageFile(self):
+        filenames = []
+        for root, dirs, files in os.walk(self.src_dir):
+            for file in files:
+                if re.search('.(jpe?g|png)$', file, re.M | re.I):
+                    filenames.append(file)
+        return filenames
+
     @staticmethod
     def hex2rgb(hex_color: str):
         hex_color = hex_color.lstrip('#')
@@ -77,16 +79,17 @@ class Handler:
         return tuple(color)
 
     def transparent_back(self, imgIns):
-        R, G, B = self.autograph_color
+        signatureColor = self.signatureColor
         imgIns = imgIns.convert('RGBA')
         L, H = imgIns.size
         for h in range(H):
             for l in range(L):
                 dot = (l, h)
                 r, g, b, a = imgIns.getpixel(dot)
-                if r > 0 & r < 255:
+                if 0 < r < 255:
                     a = r
                 else:
                     a = 0
-                imgIns.putpixel(dot, (R, G, B, a))
+                signatureColor[3] = a
+                imgIns.putpixel(dot, tuple(signatureColor))
         return imgIns
